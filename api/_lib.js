@@ -35,7 +35,7 @@ export async function limit(req, name, max, sec) {
 }
 
 export async function telegram(text) {
-  const t = process.env.TELEGRAM_TOKEN, chat = process.env.TELEGRAM_CHAT_ID;
+  const t = (process.env.TELEGRAM_TOKEN || "").trim(), chat = (process.env.TELEGRAM_CHAT_ID || "").trim();
   if (!t || !chat) return false;
   try {
     const r = await fetch(`https://api.telegram.org/bot${t}/sendMessage`, {
