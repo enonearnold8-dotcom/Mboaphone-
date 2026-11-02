@@ -3,7 +3,14 @@ import { same, send } from "./_lib.js";
 
 export default async function handler(req, res) {
   const pin = (process.env.ADMIN_PIN || "").trim();
-  if (!pin || !same(String(req.query.pin || "").trim(), pin)) return send(res, 403, { ok: false, erreur: "Ajoute ?pin=TON_ADMIN_PIN à la fin de l'adresse." });
+  if (!req.query.pin) {
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    return res.status(200).send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Test Telegram</title>
+<body style="font-family:system-ui;padding:24px;max-width:420px;margin:auto"><h2>Test Telegram MboaPhone</h2>
+<form method="get"><label>Ton code gérant (ADMIN_PIN)<br><input name="pin" type="password" required style="width:100%;font-size:18px;padding:12px;margin:8px 0;box-sizing:border-box"></label>
+<button style="width:100%;font-size:18px;padding:14px;background:#1673ff;color:#fff;border:0;border-radius:10px">Lancer le test</button></form></body>`);
+  }
+  if (!pin ||!same(String(req.query.pin || "").trim(), pin)) return send(res, 403, { ok: false, erreur: "Ajoute ?pin=TON_ADMIN_PIN à la fin de l'adresse." });
   const t = (process.env.TELEGRAM_TOKEN || "").trim(), chat = (process.env.TELEGRAM_CHAT_ID || "").trim();
   const out = { token_present: !!t, chat_id_enregistre: chat || "(vide)" };
   if (!t) return send(res, 200, { ...out, conseil: "TELEGRAM_TOKEN manque sur Vercel." });
