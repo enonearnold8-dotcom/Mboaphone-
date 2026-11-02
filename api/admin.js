@@ -6,9 +6,9 @@ export default async function handler(req, res) {
     const b = req.body || {};
     if (b.action === "login") {
       if (!(await limit(req, "login", 8, 900))) return send(res, 429, { ok: false, error: "Trop d'essais. Attendez 15 minutes." });
-      const pin = process.env.ADMIN_PIN;
+      const pin = (process.env.ADMIN_PIN || "").trim();
       if (!pin || pin.length < 6) return send(res, 200, { ok: false, error: "Code administrateur non configuré sur Vercel (ADMIN_PIN, 6 caractères minimum)." });
-      if (!same(String(b.pin || ""), pin)) { await telegram("⚠️ Tentative de connexion à l'espace gérant avec un mauvais code."); return send(res, 200, { ok: false, error: "Code incorrect." }) }
+      if (!same(String(b.pin || "").trim(), pin)) { await telegram("⚠️ Tentative de connexion à l'espace gérant avec un mauvais code."); return send(res, 200, { ok: false, error: "Code incorrect." }) }
       return send(res, 200, { ok: true, token: await newAdminToken() });
     }
     if (!(await isAdmin(b.token))) return send(res, 200, { ok: false, error: "Session expirée. Reconnectez-vous." });

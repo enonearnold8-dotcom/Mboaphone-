@@ -2,8 +2,8 @@
 import { same, send } from "./_lib.js";
 
 export default async function handler(req, res) {
-  const pin = process.env.ADMIN_PIN;
-  if (!pin || !same(String(req.query.pin || ""), pin)) return send(res, 403, { ok: false, erreur: "Ajoute ?pin=TON_ADMIN_PIN à la fin de l'adresse." });
+  const pin = (process.env.ADMIN_PIN || "").trim();
+  if (!pin || !same(String(req.query.pin || "").trim(), pin)) return send(res, 403, { ok: false, erreur: "Ajoute ?pin=TON_ADMIN_PIN à la fin de l'adresse." });
   const t = (process.env.TELEGRAM_TOKEN || "").trim(), chat = (process.env.TELEGRAM_CHAT_ID || "").trim();
   const out = { token_present: !!t, chat_id_enregistre: chat || "(vide)" };
   if (!t) return send(res, 200, { ...out, conseil: "TELEGRAM_TOKEN manque sur Vercel." });
